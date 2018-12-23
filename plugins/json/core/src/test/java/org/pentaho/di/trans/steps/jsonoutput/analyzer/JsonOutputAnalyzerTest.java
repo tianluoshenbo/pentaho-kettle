@@ -41,10 +41,14 @@ import org.pentaho.metaverse.api.IMetaverseBuilder;
 import org.pentaho.metaverse.api.IMetaverseObjectFactory;
 import org.pentaho.metaverse.api.INamespace;
 import org.pentaho.metaverse.api.MetaverseObjectFactory;
+import org.pentaho.metaverse.api.analyzer.kettle.ExternalResourceCache;
 import org.pentaho.metaverse.api.model.IExternalResourceInfo;
+
+import org.powermock.reflect.Whitebox;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
@@ -90,6 +94,9 @@ public class JsonOutputAnalyzerTest {
     when( mockJsonOutput.getStepMetaInterface() ).thenReturn( meta );
     when( mockJsonOutput.getStepMeta() ).thenReturn( mockStepMeta );
     when( mockStepMeta.getStepMetaInterface() ).thenReturn( meta );
+
+    Whitebox.setInternalState( ExternalResourceCache.getInstance(), "transMap", new ConcurrentHashMap() );
+    Whitebox.setInternalState( ExternalResourceCache.getInstance(), "resourceMap", new ConcurrentHashMap() );
   }
 
   @Test
@@ -146,5 +153,18 @@ public class JsonOutputAnalyzerTest {
     resources = consumer.getResourcesFromMeta( meta );
     assertFalse( resources.isEmpty() );
     assertEquals( 2, resources.size() );
+  }
+
+  @Test
+  public void testCloneAnalyzer() {
+    final JsonOutputAnalyzer analyzer = new JsonOutputAnalyzer();
+    // verify that cloneAnalyzer returns an instance that is different from the original
+    assertNotEquals( analyzer, analyzer.cloneAnalyzer() );
+  }
+  
+  @Test
+  public void testNewInstance(){
+    JsonOutputAnalyzer analyzer = new JsonOutputAnalyzer();
+    assertTrue( analyzer.newInstance().getClass().equals(JsonOutputAnalyzer.class));
   }
 }

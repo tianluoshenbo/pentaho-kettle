@@ -90,7 +90,9 @@ public class JmsDelegate {
 
   @Injection ( name = "AMQ_SSL_TRUST_ALL", group = "SSL_GROUP" ) public String amqSslTrustAll = "";
 
-  final List<JmsProvider> jmsProviders;
+  @Injection ( name = "SSL_USE_DEFAULT_CONTEXT", group = "SSL_GROUP" ) public boolean sslUseDefaultContext = false;
+
+  List<JmsProvider> jmsProviders;
 
   public JmsDelegate( List<JmsProvider> jmsProviders ) {
     super();
@@ -117,7 +119,7 @@ public class JmsDelegate {
   }
 
   public String getConnectionUrl() {
-    return connectionType.equals( ACTIVEMQ ) ? amqUrl : ibmUrl;
+    return connectionType.equals( ACTIVEMQ.name() ) ? amqUrl : ibmUrl;
   }
 
   public String getDestinationName() {
